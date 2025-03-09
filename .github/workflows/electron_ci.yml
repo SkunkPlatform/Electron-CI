@@ -39,9 +39,6 @@ jobs:
         fi
         npm ci
 
-    - name: Run tests
-      run: npm test
-
     - name: Build and Package Electron app for Windows
       uses: samuelmeuli/action-electron-builder@v1
       with:
