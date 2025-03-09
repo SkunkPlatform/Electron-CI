@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-and-package:
-    runs-on: windows-latest # Ejecuta en Windows
+    runs-on: windows-latest
 
     strategy:
       matrix:
@@ -45,3 +45,9 @@ jobs:
     - name: Build and Package Electron app for Windows
       run: |
         npx electron-builder --win --x64 --publish never
+
+    - name: Upload Windows Build
+      uses: actions/upload-artifact@v4
+      with:
+        name: electron-windows-installer
+        path: dist/*.exe
