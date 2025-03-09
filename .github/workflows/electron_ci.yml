@@ -10,22 +10,23 @@ on:
 
 jobs:
   build-and-package:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest # Ejecuta en Windows
+
     strategy:
       matrix:
         node-version: [18.x]
 
     steps:
     - name: Check out source code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
 
     - name: Cache node modules
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.npm
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -34,21 +35,13 @@ jobs:
 
     - name: Install dependencies with check for package-lock.json
       run: |
-        if [ ! -f package-lock.json ]; then
+        if (Test-Path package-lock.json) {
+          npm ci
+        } else {
           npm install --package-lock-only
-        fi
-        npm ci
+          npm ci
+        }
 
     - name: Build and Package Electron app for Windows
-      uses: samuelmeuli/action-electron-builder@v1
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        args: |
-          --config.win.certificateSubjectName="My Company, Inc"
-          --publish never
-
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: electron-app-windows
-        path: dist/
+      run: |
+        npx electron-builder --win --x64 --publish never
